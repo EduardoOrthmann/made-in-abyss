@@ -6,7 +6,7 @@ namespace _Project.Infrastructure.DependencyInjection
     {
         public override void InstallBindings()
         {
-
+            // Global bindings
         }
     }
 }
