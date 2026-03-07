@@ -30,6 +30,15 @@ namespace _Project.Presentation.Scripts.Controllers
         public void ResumeGame() => _gameStateMachine.ChangeState(GameStateType.Playing);
         public void ReturnToMenu() => _gameStateMachine.ChangeState(GameStateType.MainMenu);
 
+        public void QuitGame()
+        {
+            #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+            #else
+                Application.Quit();
+            #endif
+        }
+
         private void HandlePauseAction()
         {
             if (_gameStateMachine.CurrentStateType == GameStateType.Playing)
