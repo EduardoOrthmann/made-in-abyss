@@ -31,6 +31,7 @@ namespace _Project.Infrastructure.DependencyInjection
             Container.BindFactory<Domain.ScriptableObjects.LevelData, System.Action, UnloadLevelCommand, UnloadLevelCommand.Factory>().AsSingle();
 
             // States
+            Container.Bind<IGameState>().To<BootstrapState>().AsSingle();
             Container.Bind<IGameState>().To<MainMenuState>().AsSingle();
             Container.Bind<IGameState>().To<PlayingState>().AsSingle();
             Container.Bind<IGameState>().To<PausedState>().AsSingle();

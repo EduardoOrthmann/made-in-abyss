@@ -43,10 +43,25 @@ namespace _Project.Presentation.Scripts.Controllers
             _inputProvider.OnPauseAction += TogglePause;
         }
 
+        private void OnEnable()
+        {
+            Bus<BootstrapReadyEvent>.OnEvent += HandleBootstrapReady;
+        }
+
+        private void OnDisable()
+        {
+            Bus<BootstrapReadyEvent>.OnEvent -= HandleBootstrapReady;
+        }
+
         private void Start()
         {
-            _gameStateMachine.ChangeState<MainMenuState>();
-            _transitionEventChannel.RaiseEvent(new TransitionPayload(false, 0f));
+            _transitionEventChannel.RaiseEvent(new TransitionPayload(true, 0f));
+            _gameStateMachine.ChangeState<BootstrapState>();
+        }
+
+        private void HandleBootstrapReady(BootstrapReadyEvent evt)
+        {
+            RequestStateChange<MainMenuState>();
         }
 
         public void RequestStateChange<TState>(bool useTransition = true) where TState : class, IGameState

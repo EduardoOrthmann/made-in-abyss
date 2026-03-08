@@ -1,5 +1,6 @@
 ﻿using System;
 using Zenject;
+using _Project.Application.Events;
 using _Project.Application.Interfaces;
 using _Project.Domain.ScriptableObjects;
 
@@ -22,7 +23,11 @@ namespace _Project.Application.Commands
 
         public void Execute()
         {
-            _sceneLoader.LoadSceneAdditive(_levelData.SceneName, _onComplete);
+            _sceneLoader.LoadSceneAdditive(_levelData.SceneName, () =>
+            {
+                Bus<LevelLoadedEvent>.Raise(new LevelLoadedEvent(_levelData));
+                _onComplete?.Invoke();
+            });
         }
 
         public class Factory : PlaceholderFactory<LevelData, Action, LoadLevelCommand> { }
