@@ -11,11 +11,13 @@ namespace _Project.Infrastructure.DependencyInjection
     public class GameInstaller : MonoInstaller
     {
         [SerializeField] private GameStateEventChannel gameStateEventChannel;
+        [SerializeField] private TransitionEventChannel transitionEventChannel;
         [SerializeField] private InputActionReference pauseInputAction;
 
         public override void InstallBindings()
         {
             Container.BindInstance(gameStateEventChannel).AsSingle();
+            Container.BindInstance(transitionEventChannel).AsSingle();
 
             Container.Bind<ITimeService>().To<UnityTimeAdapter>().AsSingle();
 
