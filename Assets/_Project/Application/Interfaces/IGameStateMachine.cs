@@ -1,11 +1,11 @@
-﻿using _Project.Application.States.GameState;
+﻿using System;
 
 namespace _Project.Application.Interfaces
 {
     public interface IGameStateMachine
     {
-        GameStateType CurrentStateType { get; }
+        Type CurrentStateType { get; }
 
-        void ChangeState(GameStateType newStateType);
+        void ChangeState<TState>() where TState : class, IGameState;
     }
 }

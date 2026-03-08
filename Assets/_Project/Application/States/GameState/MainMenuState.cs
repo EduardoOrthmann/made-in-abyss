@@ -5,7 +5,6 @@ namespace _Project.Application.States.GameState
 {
     public class MainMenuState : IGameState
     {
-        public GameStateType Type => GameStateType.MainMenu;
         private readonly GameStateEventChannel _eventChannel;
 
         public MainMenuState(GameStateEventChannel eventChannel)
@@ -13,7 +12,7 @@ namespace _Project.Application.States.GameState
             _eventChannel = eventChannel;
         }
 
-        public void Enter() => _eventChannel.RaiseEvent(GameStateType.MainMenu);
+        public void Enter() => _eventChannel.RaiseEvent(GetType());
 
         public void Exit() { }
     }

@@ -20,36 +20,45 @@ namespace _Project.Presentation.Scripts.Controllers
             _inputProvider = inputProvider;
             _transitionEventChannel = transitionEventChannel;
 
-            _inputProvider.OnPauseAction += HandlePauseAction;
+            _inputProvider.OnPauseAction += TogglePause;
         }
 
         private void Start()
         {
-            _gameStateMachine.ChangeState(GameStateType.MainMenu);
+            _gameStateMachine.ChangeState<MainMenuState>();
             _transitionEventChannel.RaiseEvent(false, 0f);
         }
 
-        public void StartGame()
+        public void RequestStateChange<TState>(bool useTransition = true) where TState : class, IGameState
         {
-            _transitionEventChannel.RaiseEvent(true, 0.5f, () =>
+            if (useTransition)
             {
-                _gameStateMachine.ChangeState(GameStateType.Playing);
-                _transitionEventChannel.RaiseEvent(false, 0.5f);
-            });
+                _transitionEventChannel.RaiseEvent(true, 0.5f, () =>
+                {
+                    _gameStateMachine.ChangeState<TState>();
+                    _transitionEventChannel.RaiseEvent(false, 0.5f, null);
+                });
+            }
+            else
+            {
+                _gameStateMachine.ChangeState<TState>();
+            }
         }
 
-        public void ReturnToMenu()
+        public void StartGameFromMenu() => RequestStateChange<PlayingState>();
+
+        public void ResumeGame() => RequestStateChange<PlayingState>(false);
+
+        public void PauseGame() => RequestStateChange<PausedState>(false);
+
+        public void RequestMainMenuState() => RequestStateChange<MainMenuState>();
+
+        private void TogglePause()
         {
-            _transitionEventChannel.RaiseEvent(true, 0.5f, () =>
-            {
-                _gameStateMachine.ChangeState(GameStateType.MainMenu);
-                _transitionEventChannel.RaiseEvent(false, 0.5f);
-            });
+            if (_gameStateMachine.CurrentStateType == typeof(PlayingState)) PauseGame();
+
+            else if (_gameStateMachine.CurrentStateType == typeof(PausedState)) ResumeGame();
         }
-
-        public void PauseGame() => _gameStateMachine.ChangeState(GameStateType.Paused);
-
-        public void ResumeGame() => _gameStateMachine.ChangeState(GameStateType.Playing);
 
         public void QuitGame()
         {
@@ -60,23 +69,11 @@ namespace _Project.Presentation.Scripts.Controllers
             #endif
         }
 
-        private void HandlePauseAction()
-        {
-            if (_gameStateMachine.CurrentStateType == GameStateType.Playing)
-            {
-                PauseGame();
-            }
-            else if (_gameStateMachine.CurrentStateType == GameStateType.Paused)
-            {
-                ResumeGame();
-            }
-        }
-
         public void Dispose()
         {
             if (_inputProvider == null) return;
 
-            _inputProvider.OnPauseAction -= HandlePauseAction;
+            _inputProvider.OnPauseAction -= TogglePause;
         }
     }
 }

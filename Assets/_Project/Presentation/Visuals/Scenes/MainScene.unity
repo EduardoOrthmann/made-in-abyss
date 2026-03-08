@@ -903,8 +903,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2612c72c5da04a23a67360cb6e7b6e01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Presentation.Scripts.Views.PauseMenuView
+  targetStateName: PausedState
   eventChannel: {fileID: 11400000, guid: 56ff545e97829b445bfb78ec1a1a37b2, type: 2}
-  targetState: 2
   visualPanel: {fileID: 921104603}
   resumeButton: {fileID: 338431054}
   mainMenuButton: {fileID: 1724109425}
@@ -1082,8 +1082,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a870ca335bb4d02afb8df337140a9ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Presentation.Scripts.Views.PlayingView
+  targetStateName: PlayingState
   eventChannel: {fileID: 11400000, guid: 56ff545e97829b445bfb78ec1a1a37b2, type: 2}
-  targetState: 1
   visualPanel: {fileID: 70403911}
 --- !u!1 &864935138
 GameObject:
@@ -1134,8 +1134,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30d58fb1ec4448ba9970fb499478edb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Project.Presentation.Scripts.Views.MainMenuView
+  targetStateName: MainMenuState
   eventChannel: {fileID: 11400000, guid: 56ff545e97829b445bfb78ec1a1a37b2, type: 2}
-  targetState: 0
   visualPanel: {fileID: 81315872}
   startButton: {fileID: 255648420}
   quitButton: {fileID: 654900577}

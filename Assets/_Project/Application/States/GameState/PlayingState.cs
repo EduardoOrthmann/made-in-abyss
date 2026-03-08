@@ -5,7 +5,6 @@ namespace _Project.Application.States.GameState
 {
     public class PlayingState : IGameState
     {
-        public GameStateType Type => GameStateType.Playing;
         private readonly GameStateEventChannel _eventChannel;
         private readonly ITimeService _timeService;
 
@@ -18,7 +17,7 @@ namespace _Project.Application.States.GameState
         public void Enter()
         {
             _timeService.SetTimeScale(1f);
-            _eventChannel.RaiseEvent(Type);
+            _eventChannel.RaiseEvent(GetType());
         }
 
         public void Exit() { }

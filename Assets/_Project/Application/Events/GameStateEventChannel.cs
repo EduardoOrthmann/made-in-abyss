@@ -1,17 +1,17 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
-using _Project.Application.States.GameState;
+using System;
 
 namespace _Project.Application.Events
 {
     [CreateAssetMenu(menuName = "Project/Events/Game State Event Channel", fileName = "GameStateEventChannel")]
     public class GameStateEventChannel : ScriptableObject
     {
-        public event UnityAction<GameStateType> OnStateChanged;
+        public event UnityAction<Type> OnStateChanged;
 
-        public void RaiseEvent(GameStateType newState)
+        public void RaiseEvent(Type stateType)
         {
-            OnStateChanged?.Invoke(newState);
+            OnStateChanged?.Invoke(stateType);
         }
     }
 }

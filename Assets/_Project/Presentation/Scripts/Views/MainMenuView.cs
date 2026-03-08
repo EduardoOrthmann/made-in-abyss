@@ -14,7 +14,7 @@ namespace _Project.Presentation.Scripts.Views
         {
             base.OnEnable();
 
-            startButton.onClick.AddListener(gameController.StartGame);
+            startButton.onClick.AddListener(gameController.StartGameFromMenu);
             quitButton.onClick.AddListener(gameController.QuitGame);
         }
 
@@ -22,7 +22,7 @@ namespace _Project.Presentation.Scripts.Views
         {
             base.OnDisable();
 
-            startButton.onClick.RemoveListener(gameController.StartGame);
+            startButton.onClick.RemoveListener(gameController.StartGameFromMenu);
             quitButton.onClick.RemoveListener(gameController.QuitGame);
         }
     }
