@@ -15,7 +15,7 @@ namespace _Project.Presentation.Scripts.Views
             base.OnEnable();
 
             resumeButton.onClick.AddListener(gameController.ResumeGame);
-            mainMenuButton.onClick.AddListener(gameController.RequestMainMenuState);
+            mainMenuButton.onClick.AddListener(gameController.ReturnToMenu);
         }
 
         protected override void OnDisable()
@@ -23,7 +23,7 @@ namespace _Project.Presentation.Scripts.Views
             base.OnDisable();
 
             resumeButton.onClick.RemoveListener(gameController.ResumeGame);
-            mainMenuButton.onClick.RemoveListener(gameController.RequestMainMenuState);
+            mainMenuButton.onClick.RemoveListener(gameController.ReturnToMenu);
         }
     }
 }

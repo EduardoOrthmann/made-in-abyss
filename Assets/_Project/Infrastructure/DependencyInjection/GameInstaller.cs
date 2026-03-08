@@ -1,4 +1,5 @@
-﻿using Zenject;
+﻿using _Project.Application.Commands;
+using Zenject;
 using UnityEngine;
 using _Project.Application.Interfaces;
 using _Project.Application.Events;
@@ -16,11 +17,20 @@ namespace _Project.Infrastructure.DependencyInjection
 
         public override void InstallBindings()
         {
+            // Event Channels
             Container.BindInstance(gameStateEventChannel).AsSingle();
             Container.BindInstance(transitionEventChannel).AsSingle();
 
+            // Services
             Container.Bind<ITimeService>().To<UnityTimeAdapter>().AsSingle();
+            Container.Bind<ISceneLoader>().To<UnitySceneLoader>().AsSingle();
 
+            // Commands
+            Container.Bind<CommandProcessor>().AsSingle();
+            Container.BindFactory<Domain.ScriptableObjects.LevelData, System.Action, LoadLevelCommand, LoadLevelCommand.Factory>().AsSingle();
+            Container.BindFactory<Domain.ScriptableObjects.LevelData, System.Action, UnloadLevelCommand, UnloadLevelCommand.Factory>().AsSingle();
+
+            // States
             Container.Bind<IGameState>().To<MainMenuState>().AsSingle();
             Container.Bind<IGameState>().To<PlayingState>().AsSingle();
             Container.Bind<IGameState>().To<PausedState>().AsSingle();

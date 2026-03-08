@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using Zenject;
 using System;
+using _Project.Application.Commands;
 using _Project.Application.Events;
 using _Project.Application.Interfaces;
 using _Project.Application.States.GameState;
+using _Project.Domain.ScriptableObjects;
 
 namespace _Project.Presentation.Scripts.Controllers
 {
@@ -12,13 +14,30 @@ namespace _Project.Presentation.Scripts.Controllers
         private IGameStateMachine _gameStateMachine;
         private IInputProvider _inputProvider;
         private TransitionEventChannel _transitionEventChannel;
+        private CommandProcessor _commandProcessor;
+        private LoadLevelCommand.Factory _loadLevelCommandFactory;
+        private UnloadLevelCommand.Factory _unloadLevelCommandFactory;
+
+        [Header("Level Configuration")]
+        [SerializeField] private LevelData currentLevelData;
+
+        private bool _isLevelLoaded = false;
 
         [Inject]
-        public void Construct(IGameStateMachine stateMachine, IInputProvider inputProvider, TransitionEventChannel transitionEventChannel)
+        public void Construct(
+            IGameStateMachine stateMachine,
+            IInputProvider inputProvider,
+            TransitionEventChannel transitionEventChannel,
+            CommandProcessor commandProcessor,
+            LoadLevelCommand.Factory loadLevelCommandFactory,
+            UnloadLevelCommand.Factory unloadLevelCommandFactory)
         {
             _gameStateMachine = stateMachine;
             _inputProvider = inputProvider;
             _transitionEventChannel = transitionEventChannel;
+            _commandProcessor = commandProcessor;
+            _loadLevelCommandFactory = loadLevelCommandFactory;
+            _unloadLevelCommandFactory = unloadLevelCommandFactory;
 
             _inputProvider.OnPauseAction += TogglePause;
         }
@@ -33,10 +52,10 @@ namespace _Project.Presentation.Scripts.Controllers
         {
             if (useTransition)
             {
-                _transitionEventChannel.RaiseEvent(true, 0.5f, () =>
+                ExecuteWithTransition(onComplete =>
                 {
                     _gameStateMachine.ChangeState<TState>();
-                    _transitionEventChannel.RaiseEvent(false, 0.5f, null);
+                    onComplete?.Invoke();
                 });
             }
             else
@@ -45,19 +64,50 @@ namespace _Project.Presentation.Scripts.Controllers
             }
         }
 
-        public void StartGameFromMenu() => RequestStateChange<PlayingState>();
+        public void StartGameFromMenu()
+        {
+            ExecuteWithTransition(onComplete =>
+            {
+                var loadCommand = _loadLevelCommandFactory.Create(currentLevelData, () =>
+                {
+                    _isLevelLoaded = true;
+                    _gameStateMachine.ChangeState<PlayingState>();
+                    onComplete?.Invoke();
+                });
+
+                _commandProcessor.ExecuteCommand(loadCommand);
+            });
+        }
 
         public void ResumeGame() => RequestStateChange<PlayingState>(false);
 
         public void PauseGame() => RequestStateChange<PausedState>(false);
 
-        public void RequestMainMenuState() => RequestStateChange<MainMenuState>();
-
-        private void TogglePause()
+        public void ReturnToMenu()
         {
-            if (_gameStateMachine.CurrentStateType == typeof(PlayingState)) PauseGame();
+            ExecuteWithTransition(onComplete =>
+            {
+                Action completeTransition = () =>
+                {
+                    _gameStateMachine.ChangeState<MainMenuState>();
+                    onComplete?.Invoke();
+                };
 
-            else if (_gameStateMachine.CurrentStateType == typeof(PausedState)) ResumeGame();
+                if (_isLevelLoaded)
+                {
+                    var unloadCommand = _unloadLevelCommandFactory.Create(currentLevelData, () =>
+                    {
+                        _isLevelLoaded = false;
+                        completeTransition();
+                    });
+
+                    _commandProcessor.ExecuteCommand(unloadCommand);
+                }
+                else
+                {
+                    completeTransition();
+                }
+            });
         }
 
         public void QuitGame()
@@ -69,11 +119,26 @@ namespace _Project.Presentation.Scripts.Controllers
             #endif
         }
 
+        private void TogglePause()
+        {
+            if (_gameStateMachine.CurrentStateType == typeof(PlayingState)) PauseGame();
+
+            else if (_gameStateMachine.CurrentStateType == typeof(PausedState)) ResumeGame();
+        }
+
         public void Dispose()
         {
             if (_inputProvider == null) return;
 
             _inputProvider.OnPauseAction -= TogglePause;
+        }
+
+        private void ExecuteWithTransition(Action<Action> midTransitionAction)
+        {
+            _transitionEventChannel.RaiseEvent(true, 0.5f, () =>
+            {
+                midTransitionAction?.Invoke(() => _transitionEventChannel.RaiseEvent(false, 0.5f));
+            });
         }
     }
 }
