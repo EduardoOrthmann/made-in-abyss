@@ -14,12 +14,12 @@ namespace _Project.Presentation.Scripts.Views
 
         protected virtual void OnEnable()
         {
-            eventChannel.OnStateChanged += HandleStateChanged;
+            eventChannel.OnEventRaised += HandleStateChanged;
         }
 
         protected virtual void OnDisable()
         {
-            eventChannel.OnStateChanged -= HandleStateChanged;
+            eventChannel.OnEventRaised -= HandleStateChanged;
         }
 
         private void HandleStateChanged(Type stateType)

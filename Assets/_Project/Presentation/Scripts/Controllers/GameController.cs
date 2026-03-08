@@ -3,6 +3,7 @@ using Zenject;
 using System;
 using _Project.Application.Commands;
 using _Project.Application.Events;
+using _Project.Application.Events.Payload;
 using _Project.Application.Interfaces;
 using _Project.Application.States.GameState;
 using _Project.Domain.ScriptableObjects;
@@ -45,7 +46,7 @@ namespace _Project.Presentation.Scripts.Controllers
         private void Start()
         {
             _gameStateMachine.ChangeState<MainMenuState>();
-            _transitionEventChannel.RaiseEvent(false, 0f);
+            _transitionEventChannel.RaiseEvent(new TransitionPayload(false, 0f));
         }
 
         public void RequestStateChange<TState>(bool useTransition = true) where TState : class, IGameState
@@ -135,10 +136,12 @@ namespace _Project.Presentation.Scripts.Controllers
 
         private void ExecuteWithTransition(Action<Action> midTransitionAction)
         {
-            _transitionEventChannel.RaiseEvent(true, 0.5f, () =>
+            _transitionEventChannel.RaiseEvent(new TransitionPayload(true, 0.5f, () =>
             {
-                midTransitionAction?.Invoke(() => _transitionEventChannel.RaiseEvent(false, 0.5f));
-            });
+                midTransitionAction?.Invoke(() =>
+                    _transitionEventChannel.RaiseEvent(new TransitionPayload(false, 0.5f))
+                );
+            }));
         }
     }
 }

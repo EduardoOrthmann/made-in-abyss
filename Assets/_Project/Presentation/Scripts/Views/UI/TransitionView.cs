@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using _Project.Application.Events;
+using _Project.Application.Events.Payload;
 
 namespace _Project.Presentation.Scripts.Views.UI
 {
@@ -19,18 +20,18 @@ namespace _Project.Presentation.Scripts.Views.UI
 
         private void OnEnable()
         {
-            transitionEventChannel.OnTransitionRequested += HandleTransition;
+            if (transitionEventChannel != null) transitionEventChannel.OnEventRaised += HandleTransition;
         }
 
         private void OnDisable()
         {
-            transitionEventChannel.OnTransitionRequested -= HandleTransition;
+            if (transitionEventChannel != null) transitionEventChannel.OnEventRaised -= HandleTransition;
         }
 
-        private void HandleTransition(bool fadeToBlack, float duration, Action onComplete)
+        private void HandleTransition(TransitionPayload payload)
         {
             StopAllCoroutines();
-            StartCoroutine(FadeRoutine(fadeToBlack, duration, onComplete));
+            StartCoroutine(FadeRoutine(payload.FadeToBlack, payload.Duration, payload.OnComplete));
         }
 
         private IEnumerator FadeRoutine(bool fadeToBlack, float duration, Action onComplete)
